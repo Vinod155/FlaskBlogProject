@@ -1,0 +1,33 @@
+from flask_wtf import FlaskForm
+from wtforms import StringField ,PasswordField,SubmitField,BooleanField,ValidationError
+from wtforms.validators import DataRequired,Length,Email,EqualTo
+from flaskblog.models import User 
+
+class RegisterationForm(FlaskForm):
+    username=StringField('Username',
+                         validators=[DataRequired(),Length(min=2,max=20)])
+    email=StringField('Email',
+                      validators=[DataRequired(),Email()])
+    password=PasswordField('Password',validators=[DataRequired()])
+    confirm_password=PasswordField('Confirm Password',
+                                   validators=[DataRequired(),EqualTo('password')])
+    submit=SubmitField('Sign Up')
+    
+    def validate_username(self, username):
+        user=User.query.filter_by(username=username.data).first()
+
+        if user:
+            raise ValidationError('This username is taken please choose different name')
+    
+    def validate_email(self, email):
+        email=User.query.filter_by(email=email.data).first()
+
+        if email:
+            raise ValidationError('This email is taken please choose different email')
+
+class LoginForm(FlaskForm):
+    email=StringField('Email',
+                      validators=[DataRequired(),Email()])
+    password=PasswordField('Password',validators=[DataRequired()])
+    remember=BooleanField('Remember Me')
+    submit=SubmitField('Login')
